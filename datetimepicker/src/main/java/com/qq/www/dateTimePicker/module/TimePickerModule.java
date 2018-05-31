@@ -42,17 +42,27 @@ public class TimePickerModule extends WXModule {
 
     String title, max, min, titleColor, confirmTitle, confirmTitleColor, cancelTitle, cancelTitleColor, value;
 
+//    @JSMethod
+//    public void open(String params, JSCallback resultCallback) {
+//        WeexEventBean eventBean = new WeexEventBean();
+//        eventBean.setKey(WXEventCenter.EVENT_OPEN);
+//        eventBean.setJsParams(params);
+//        eventBean.setJscallback(resultCallback);
+//        eventBean.setContext(mWXSDKInstance.getContext());
+//        ManagerFactory.getManagerService(DispatchEventManager.class).getBus().post(eventBean);
+//        datePicker(eventBean.getJsParams(), resultCallback);
+//    }
+
     @JSMethod
     public void open(String params, JSCallback resultCallback) {
         WeexEventBean eventBean = new WeexEventBean();
-        eventBean.setKey(WXEventCenter.EVENT_OPEN);
         eventBean.setJsParams(params);
-        eventBean.setJscallback(resultCallback);
-        eventBean.setContext(mWXSDKInstance.getContext());
-        ManagerFactory.getManagerService(DispatchEventManager.class).getBus().post(eventBean);
-        datePicker(eventBean.getJsParams(), resultCallback);
+        try {
+            datePicker(eventBean.getJsParams(), resultCallback);
+        } catch (Throwable throwable) {
+            throwable.printStackTrace();
+        }
     }
-
 
     private void datePicker(String params, final JSCallback callback) {
         try {
