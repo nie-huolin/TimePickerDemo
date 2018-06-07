@@ -1,20 +1,14 @@
 package com.qq.www.dateTimePicker.module;
 
 import android.support.annotation.Nullable;
-import android.text.TextUtils;
 
 import com.alibaba.weex.plugin.annotation.WeexModule;
-import com.benmu.framework.constant.WXEventCenter;
-import com.benmu.framework.manager.ManagerFactory;
-import com.benmu.framework.manager.impl.dispatcher.DispatchEventManager;
-import com.benmu.framework.model.WeexEventBean;
 import com.qq.www.dateTimePicker.widget.CustomDatePicker;
 import com.taobao.weex.annotation.JSMethod;
 import com.taobao.weex.bridge.JSCallback;
 import com.taobao.weex.common.WXModule;
+import com.taobao.weex.utils.WXResourceUtils;
 
-import org.json.JSONException;
-import org.json.JSONObject;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -40,83 +34,37 @@ public class TimePickerModule extends WXModule {
     private static final String RESULT = "result";
     private static final String DATA = "data";
 
-    String title, max, min, titleColor, confirmTitle, confirmTitleColor, cancelTitle, cancelTitleColor, value;
+    private static final String KEY_VALUE = "value";
+    private static final String KEY_INDEX = "index";
+    private static final String KEY_TITLE = "title";
+    private static final String KEY_MAX = "max";
+    private static final String KEY_MIN = "min";
+    private static final String KEY_ITEMS = "items";
 
-//    @JSMethod
-//    public void open(String params, JSCallback resultCallback) {
-//        WeexEventBean eventBean = new WeexEventBean();
-//        eventBean.setKey(WXEventCenter.EVENT_OPEN);
-//        eventBean.setJsParams(params);
-//        eventBean.setJscallback(resultCallback);
-//        eventBean.setContext(mWXSDKInstance.getContext());
-//        ManagerFactory.getManagerService(DispatchEventManager.class).getBus().post(eventBean);
-//        datePicker(eventBean.getJsParams(), resultCallback);
-//    }
+    private static final String KEY_TITLE_COLOR = "titleColor";
+    private static final String KEY_CANCEL_TITLE_COLOR = "cancelTitleColor";
+    private static final String KEY_CONFIRM_TITLE = "confirmTitle";
+    private static final String KEY_CANCEL_TITLE = "cancelTitle";
+    private static final String KEY_CONFIRM_TITLE_COLOR = "confirmTitleColor";
 
     @JSMethod
-    public void open(String params, JSCallback resultCallback) {
-        WeexEventBean eventBean = new WeexEventBean();
-        eventBean.setJsParams(params);
-        try {
-            datePicker(eventBean.getJsParams(), resultCallback);
-        } catch (Throwable throwable) {
-            throwable.printStackTrace();
-        }
+    public void open(Map<String, Object> params, JSCallback resultCallback) {
+        datePicker(params, resultCallback);
     }
 
-    private void datePicker(String params, final JSCallback callback) {
-        try {
-            JSONObject jsonObject = new JSONObject(params);
-            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.CHINA);
-            String now = sdf.format(new Date());
-            if (jsonObject.has("value")) {
-                value = !TextUtils.isEmpty(jsonObject.getString("value")) ? jsonObject.getString("value") : now;
-            } else {
-                value = now;
-            }
-            if (jsonObject.has("title")) {
-                title = !TextUtils.isEmpty(jsonObject.getString("title")) ? jsonObject.getString("title") : "选择时间";
-            } else {
-                title = "选择时间";
-            }
-            if (jsonObject.has("max")) {
-                max = !TextUtils.isEmpty(jsonObject.getString("max")) ? jsonObject.getString("max") : "2099-12-31 23:59";
-            } else {
-                max = "2099-12-31 23:59";
-            }
-            if (jsonObject.has("min")) {
-                min = !TextUtils.isEmpty(jsonObject.getString("min")) ? jsonObject.getString("min") : "1900-12-31 00:00";
-            } else {
-                min = "1900-12-31 00:00";
-            }
-            if (jsonObject.has("titleColor")) {
-                titleColor = !TextUtils.isEmpty(jsonObject.getString("titleColor")) ? jsonObject.getString("titleColor") : "#0092ff";
-            } else {
-                titleColor = "#0092ff";
-            }
-            if (jsonObject.has("confirmTitle")) {
-                confirmTitle = !TextUtils.isEmpty(jsonObject.getString("confirmTitle")) ? jsonObject.getString("confirmTitle") : "完成";
-            } else {
-                confirmTitle = "完成";
-            }
-            if (jsonObject.has("confirmTitleColor")) {
-                confirmTitleColor = !TextUtils.isEmpty(jsonObject.getString("confirmTitleColor")) ? jsonObject.getString("confirmTitleColor") : "#0092ff";
-            } else {
-                confirmTitleColor = "#0092ff";
-            }
-            if (jsonObject.has("cancelTitle")) {
-                cancelTitle = !TextUtils.isEmpty(jsonObject.getString("cancelTitle")) ? jsonObject.getString("cancelTitle") : "取消";
-            } else {
-                cancelTitle = "取消";
-            }
-            if (jsonObject.has("cancelTitleColor")) {
-                cancelTitleColor = !TextUtils.isEmpty(jsonObject.getString("cancelTitleColor")) ? jsonObject.getString("cancelTitleColor") : "#0092ff";
-            } else {
-                cancelTitleColor = "#0092ff";
-            }
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
+    private void datePicker(Map<String, Object> params, final JSCallback callback) {
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.CHINA);
+        String now = sdf.format(new Date());
+        String value = getOption(params, KEY_VALUE, now);
+        String title = getOption(params, KEY_TITLE, "选择时间");
+        String max = getOption(params, KEY_MAX, "2099-12-31 23:59");
+        String min = getOption(params, KEY_MIN, "1900-12-31 00:00");
+        String titleColor = getOption(params, KEY_TITLE_COLOR, "#0092ff");
+        String confirmTitle = getOption(params, KEY_CONFIRM_TITLE, "完成");
+        String confirmTitleColor = getOption(params, KEY_CONFIRM_TITLE_COLOR, "#0092ff");
+        String cancelTitle = getOption(params, KEY_CANCEL_TITLE, "取消");
+        String cancelTitleColor = getOption(params, KEY_CANCEL_TITLE_COLOR, "#0092ff");
+
 
         new CustomDatePicker(mWXSDKInstance.getContext(), min, max, title, titleColor,
                 confirmTitle, confirmTitleColor, cancelTitle, cancelTitleColor, value, new CustomDatePicker.OnPickListener() {
@@ -136,6 +84,28 @@ public class TimePickerModule extends WXModule {
                 }
             }
         });
+    }
+
+    private <T> T getOption(Map<String, Object> options, String key, T defValue) {
+        Object value = options.get(key);
+        if (value == null || value.equals("")) {
+            return defValue;
+        } else {
+            try {
+                return (T) value;
+            } catch (Exception e) {
+                e.printStackTrace();
+                return defValue;
+            }
+        }
+    }
+
+    private int getColor(Map<String, Object> options, String key, int defValue) {
+        Object value = getOption(options, key, null);
+        if (value == null) {
+            return defValue;
+        }
+        return WXResourceUtils.getColor(value.toString(), defValue);
     }
 
 }
