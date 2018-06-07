@@ -5,13 +5,12 @@ android {
     defaultConfig {
         applicationId "com.qbm.www.timepickerdemo"
         minSdkVersion 16
-        targetSdkVersion 25
+        targetSdkVersion 22
         versionCode 1
         versionName "1.0.1"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
 
-        //添加如下配置就OK了
-        javaCompileOptions { annotationProcessorOptions { includeCompileClasspath = true } }
+        javaCompileOptions.annotationProcessorOptions.includeCompileClasspath = true
     }
     buildTypes {
         release {
@@ -32,6 +31,7 @@ dependencies {
 //    testCompile 'junit:junit:4.12'
     compile 'io.reactivex:rxjava:1.0.14'
     compile 'io.reactivex:rxandroid:1.0.1'
-    implementation project(':datetimepicker')
+    //simplementation project(':datetimepicker')
     compile 'org.jetbrains:annotations-java5:15.0'
+    implementation project(':datetimepicker')
 }
